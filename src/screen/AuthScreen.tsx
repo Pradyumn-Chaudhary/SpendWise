@@ -11,6 +11,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
 import { Eye, EyeOff } from 'lucide-react-native';
+import firestore from '@react-native-firebase/firestore';
 
 type AuthProps = {
   logo: any;
@@ -74,32 +75,63 @@ export default function AuthScreen({
     return emailRegex.test(email);
   }
 
-  const handleSignUp = () => {
-    if (password.length == 0 || username.length == 0 || !isValidEmail(email)) {
-      console.log('All field contain valid values');
+  const handleSignUp = async () => {
+    // --- 1.Validation with User Feedback ---
+    if (!username || !password || !email) {
+      console.log('Missing Information', 'Please fill in all fields.');
+      return;
+    }
+    if (!isValidEmail(email)) {
+      console.log('Invalid Email', 'Please enter a valid email address.');
       return;
     }
     if (password.length < 8) {
-      console.log('Password should have atleast 8 digits');
+      console.log(
+        'Weak Password',
+        'Password must be at least 8 characters long.',
+      );
       return;
     }
+
     setIsBtnPressed(true);
-    createUserWithEmailAndPassword(getAuth(), email, password)
-      .then(() => {
-        console.log('User account created & signed in!');
-      })
-      .catch(error => {
-        setIsBtnPressed(false);
-        if (error.code === 'auth/email-already-in-use') {
-          console.log('That email address is already in use!');
-        }
 
-        if (error.code === 'auth/invalid-email') {
-          console.log('That email address is invalid!');
-        }
+    // --- 2. Using try...catch for Cleaner Async Code ---
+    try {
+      // Create the user in Firebase Authentication
+      const userCredential = await auth().createUserWithEmailAndPassword(
+        email,
+        password,
+      );
+      const user = userCredential.user;
 
+      // --- 3. CRITICAL: Store the user's UID in Firestore ---
+      if (user) {
+        await firestore().collection('Users').doc(user.uid).set({
+          username: username,
+          email: email,
+          uid: user.uid, // Storing uid for future reference
+          isEmailVerified: false,
+          createdAt: firestore.FieldValue.serverTimestamp(),
+        });
+        console.log('User account created & user data saved!');
+      }
+    } catch (error: any) {
+      // --- 4. Unified Error Handling ---
+      if (error.code === 'auth/email-already-in-use') {
+        console.log('Sign Up Failed', 'That email address is already in use!');
+      } else if (error.code === 'auth/invalid-email') {
+        console.log('Sign Up Failed', 'The email address is invalid!');
+      } else {
+        console.log(
+          'An Error Occurred',
+          'Something went wrong during sign-up.',
+        );
         console.error(error);
-      });
+      }
+    } finally {
+      // --- 5. Always Reset Button State ---
+      setIsBtnPressed(false);
+    }
   };
 
   const handleSignIn = async () => {
@@ -107,7 +139,6 @@ export default function AuthScreen({
       console.log('Please enter both email and password.');
       return;
     }
-    setIsBtnPressed(true);
     try {
       // This is the actual function call
       await auth().signInWithEmailAndPassword(email, password);
@@ -121,6 +152,8 @@ export default function AuthScreen({
         console.log('Something went wrong. Please try again later.');
         console.error(error);
       }
+    } finally {
+      setIsBtnPressed(false);
     }
   };
 
@@ -215,7 +248,7 @@ const styles = StyleSheet.create({
   eye: {
     position: 'absolute',
     right: 25,
-    top: 25
+    top: 25,
   },
   footerRow: { flexDirection: 'row', justifyContent: 'center' },
   footerText: { color: '#3d3831' },
