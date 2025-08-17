@@ -19,6 +19,10 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import firestore from '@react-native-firebase/firestore';
+import uuid from 'react-native-uuid';
+import auth from '@react-native-firebase/auth';
+import { useNavigation } from '@react-navigation/native';
 
 const today = new Date();
 
@@ -33,6 +37,8 @@ export default function NewTransaction() {
   const [amount, setAmount] = useState('');
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState('');
+  const uid = auth().currentUser?.uid;
+  const navigation = useNavigation<any>();
 
   const categories = [
     { name: 'Food', icon: Utensils },
@@ -45,12 +51,56 @@ export default function NewTransaction() {
     { name: 'Other', icon: MoreHorizontal },
   ];
 
+  const handleSave = async () => {
+    if (!amount || !title || !category) {
+      console.log('Incomplete', 'Please fill in all fields.');
+      return;
+    }
+    const Amount = parseFloat(amount);
+    const newTransaction = {
+      id: uuid.v4(),
+      title: title,
+      category: category,
+      amount: Amount,
+      type: type,
+      date: formattedDate,
+      createdAt: Date.now(),
+    };
+
+    try {
+      // 1. Get a reference to the user's document
+      const userRef = firestore().collection('Users').doc(uid);
+      // 2. Atomically add the new transaction to the array in Firestore
+      await userRef.update({
+        transactions: firestore.FieldValue.arrayUnion(newTransaction),
+      });
+      if (type === 'income') {
+        await userRef.update({
+          income: firestore.FieldValue.increment(Amount),
+          totalBalance: firestore.FieldValue.increment(Amount),
+        });
+      } else {
+        // type is 'expense'
+        await userRef.update({
+          expenses: firestore.FieldValue.increment(Amount),
+          totalBalance: firestore.FieldValue.increment(-Amount),
+        });
+      }
+
+      console.log('Transaction added successfully!');
+      navigation.navigate('Expenses');
+    } catch (error) {
+      console.error('Error saving transaction:', error);
+      // Alert.alert('Error', 'Failed to save transaction.');
+    }
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerText}>New Transaction</Text>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={handleSave}>
           <Text style={styles.save}>Save ✓</Text>
         </TouchableOpacity>
       </View>

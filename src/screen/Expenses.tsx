@@ -1,16 +1,17 @@
 import auth from '@react-native-firebase/auth';
 import firestore, {
   FirebaseFirestoreTypes,
+  Timestamp,
 } from '@react-native-firebase/firestore';
-import { Ghost, LogOut } from 'lucide-react-native';
+import { LogOut } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import {
+  FlatList,
   Image,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  FlatList,
 } from 'react-native';
 import Transaction from '../Components/Buttons/Transactions';
 
@@ -33,6 +34,7 @@ interface TransactionType {
   amount: number;
   type: 'income' | 'expense';
   date: string;
+  createdAt: Timestamp;
 }
 
 export default function Expenses({ navigation }: any) {
@@ -53,7 +55,7 @@ export default function Expenses({ navigation }: any) {
               if (data) {
                 console.log('✅ Successfully fetched Firestore document:');
                 setUserData(data as UserData);
-                setTransactions(userData?.transactions!);
+                setTransactions(data.transactions!);
               }
             } else {
               console.error(
@@ -132,6 +134,7 @@ export default function Expenses({ navigation }: any) {
       <FlatList
         style={{ width: '100%', padding: 0 }}
         data={transactions}
+        inverted={true}
         keyExtractor={item => item.id}
         renderItem={({ item }) => (
           <Transaction
