@@ -133,8 +133,8 @@ export default function Expenses({ navigation }: any) {
 
       <FlatList
         style={{ width: '100%', padding: 0 }}
-        data={transactions}
-        inverted={true}
+        data={[...transactions].reverse()}
+        // inverted={true}
         keyExtractor={item => item.id}
         renderItem={({ item }) => (
           <Transaction
