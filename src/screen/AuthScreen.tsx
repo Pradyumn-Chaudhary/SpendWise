@@ -9,6 +9,8 @@ import {
   createUserWithEmailAndPassword,
 } from '@react-native-firebase/auth';
 import { useNavigation } from '@react-navigation/native';
+import auth from '@react-native-firebase/auth';
+import { Eye, EyeOff } from 'lucide-react-native';
 
 type AuthProps = {
   logo: any;
@@ -38,6 +40,7 @@ export default function AuthScreen({
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isBtnPressed, setIsBtnPressed] = useState(false);
+  const [show, setShow] = useState(false);
 
   // Set an initializing state whilst Firebase connects
   const [initializing, setInitializing] = useState(true);
@@ -65,8 +68,7 @@ export default function AuthScreen({
 
   if (initializing) return null;
 
-
-  function isValidEmail(email:string) {
+  function isValidEmail(email: string) {
     // Regex to check for a valid email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
@@ -74,11 +76,11 @@ export default function AuthScreen({
 
   const handleSignUp = () => {
     if (password.length == 0 || username.length == 0 || !isValidEmail(email)) {
-      console.log("All field contain valid values");
+      console.log('All field contain valid values');
       return;
     }
     if (password.length < 8) {
-      console.log("Password should have atleast 8 digits")
+      console.log('Password should have atleast 8 digits');
       return;
     }
     setIsBtnPressed(true);
@@ -87,6 +89,7 @@ export default function AuthScreen({
         console.log('User account created & signed in!');
       })
       .catch(error => {
+        setIsBtnPressed(false);
         if (error.code === 'auth/email-already-in-use') {
           console.log('That email address is already in use!');
         }
@@ -99,7 +102,27 @@ export default function AuthScreen({
       });
   };
 
-  const handleSignIn = () => {};
+  const handleSignIn = async () => {
+    if (!email || !password) {
+      console.log('Please enter both email and password.');
+      return;
+    }
+    setIsBtnPressed(true);
+    try {
+      // This is the actual function call
+      await auth().signInWithEmailAndPassword(email, password);
+      // If successful, the onAuthStateChanged listener will handle navigation
+      console.log('User signed in successfully!');
+    } catch (error: any) {
+      setIsBtnPressed(false);
+      if (error.code === 'auth/invalid-credential') {
+        console.log('Invalid Credentials.');
+      } else {
+        console.log('Something went wrong. Please try again later.');
+        console.error(error);
+      }
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -125,14 +148,31 @@ export default function AuthScreen({
         autoCapitalize="none"
       />
 
-      <Input
-        placeholder={
-          buttonTitle === 'Sign Up' ? 'Create Password' : 'Enter Password'
-        }
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
+      <View style={{ width: '100%', alignItems: 'center' }}>
+        <Input
+          placeholder={
+            buttonTitle === 'Sign Up' ? 'Create Password' : 'Enter Password'
+          }
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry={!show}
+        />
+        {show ? (
+          <Eye
+            onPress={() => setShow(false)}
+            size={24}
+            strokeWidth={1.3}
+            style={styles.eye}
+          />
+        ) : (
+          <EyeOff
+            onPress={() => setShow(true)}
+            size={24}
+            strokeWidth={1.3}
+            style={styles.eye}
+          />
+        )}
+      </View>
 
       <Btn
         title={buttonTitle}
@@ -171,6 +211,11 @@ const styles = StyleSheet.create({
     marginTop: 30,
     fontSize: 28,
     fontWeight: 'bold',
+  },
+  eye: {
+    position: 'absolute',
+    right: 25,
+    top: 25
   },
   footerRow: { flexDirection: 'row', justifyContent: 'center' },
   footerText: { color: '#3d3831' },
