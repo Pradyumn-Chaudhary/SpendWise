@@ -1,23 +1,32 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-} from 'react-native';
 import {
   ArrowDownCircle,
   ArrowUpCircle,
-  Utensils,
-  ShoppingCart,
   Bus,
-  Film,
   FileText,
-  Wallet,
+  Film,
+  GlassWater,
   MoreHorizontal,
+  ShoppingCart,
+  Utensils,
+  Wallet,
 } from 'lucide-react-native';
+import React, { useState } from 'react';
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+
+const today = new Date();
+
+const day = today.getDate();
+const month = today.toLocaleString('default', { month: 'short' });
+const year = today.getFullYear();
+
+const formattedDate = `${day} ${month} ${year}`;
 
 export default function NewTransaction() {
   const [type, setType] = useState('expense');
@@ -26,7 +35,8 @@ export default function NewTransaction() {
   const [category, setCategory] = useState('');
 
   const categories = [
-    { name: 'Food & Drinks', icon: Utensils },
+    { name: 'Food', icon: Utensils },
+    { name: 'Drink', icon: GlassWater },
     { name: 'Shopping', icon: ShoppingCart },
     { name: 'Transportation', icon: Bus },
     { name: 'Entertainment', icon: Film },

@@ -1,21 +1,14 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Trash2 } from 'lucide-react-native'; // example icons
-
-const today = new Date();
-
-const day = today.getDate();
-const month = today.toLocaleString('default', { month: 'short' });
-const year = today.getFullYear();
-
-const formattedDate = `${day} ${month} ${year}`;
+import { getIcon } from '../../utils/IconMap';
 
 type TransactionProps = {
   title: string;
   category: string;
   amount: number;
   type: 'income' | 'expense';
-  Icon: React.ComponentType<any>;
+  date: string;
 };
 
 export default function Transaction({
@@ -23,8 +16,9 @@ export default function Transaction({
   category,
   amount,
   type,
-  Icon,
+  date,
 }: TransactionProps) {
+  const Icon = getIcon(category);
   return (
     <View style={styles.card}>
       {/* Left Icon */}
@@ -51,10 +45,10 @@ export default function Transaction({
           ]}
         >
           {type === 'income'
-            ? `+$${amount.toFixed(2)}`
-            : `-$${amount.toFixed(2)}`}
+            ? `₹${amount.toFixed(2)}`
+            : `₹${amount.toFixed(2)}`}
         </Text>
-        <Text style={styles.date}>{formattedDate}</Text>
+        <Text style={styles.date}>{date}</Text>
       </View>
 
       {/* Delete Icon */}
@@ -76,7 +70,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 16,
     padding: 14,
-    marginHorizontal: 16,
     marginVertical: 6,
     shadowColor: '#000',
     shadowOpacity: 0.05,

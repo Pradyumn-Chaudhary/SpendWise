@@ -1,13 +1,77 @@
-import { FirebaseAuthTypes, getAuth, onAuthStateChanged, signOut } from '@react-native-firebase/auth';
+import auth from '@react-native-firebase/auth';
+import firestore, {
+  FirebaseFirestoreTypes,
+} from '@react-native-firebase/firestore';
 import { Ghost, LogOut } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  FlatList,
+} from 'react-native';
 import Transaction from '../Components/Buttons/Transactions';
-import auth from '@react-native-firebase/auth';
+
+type UserData = {
+  username: string;
+  email: string;
+  uid: string;
+  isEmailVerified: boolean;
+  createdAt: FirebaseFirestoreTypes.Timestamp;
+  totalBalance: number;
+  income: number;
+  expenses: number;
+  transactions: [];
+};
+
+interface TransactionType {
+  id: string;
+  title: string;
+  category: string;
+  amount: number;
+  type: 'income' | 'expense';
+  date: string;
+}
 
 export default function Expenses({ navigation }: any) {
-  const [username, setUsername] = useState('Anu Kuntal');
-  const userId = auth().currentUser?.uid;
+  const [userData, setUserData] = useState<UserData | null>(null);
+  const [transactions, setTransactions] = useState<TransactionType[]>([]);
+
+  useEffect(() => {
+    const subscriber = auth().onAuthStateChanged(user => {
+      if (user) {
+        // Now, we attempt the Firestore get()
+        firestore()
+          .collection('Users')
+          .doc(user.uid)
+          .get()
+          .then(documentSnapshot => {
+            if (documentSnapshot.exists()) {
+              const data = documentSnapshot.data();
+              if (data) {
+                console.log('✅ Successfully fetched Firestore document:');
+                setUserData(data as UserData);
+                setTransactions(userData?.transactions!);
+              }
+            } else {
+              console.error(
+                '❌ Firestore document does NOT exist for this UID!',
+              );
+            }
+          })
+          .catch(error => {
+            console.error('❌ Firestore GET operation failed:', error);
+          });
+      } else {
+        // User is signed out.
+        console.error('❌ Auth listener CONFIRMED NO user is signed in.');
+      }
+    });
+
+    return subscriber; // Unsubscribe on unmount
+  }, []);
 
   const handleSignOut = async () => {
     try {
@@ -27,7 +91,7 @@ export default function Expenses({ navigation }: any) {
 
           <View style={styles.userInfo}>
             <Text style={styles.welcomeText}>Welcome</Text>
-            <Text style={styles.username}>{username}</Text>
+            <Text style={styles.username}>{userData?.username}</Text>
           </View>
         </View>
 
@@ -48,36 +112,36 @@ export default function Expenses({ navigation }: any) {
       {/* Balance Card */}
       <View style={styles.card}>
         <Text style={styles.title}>Total Balance</Text>
-        <Text style={styles.balance}>₹5216.00</Text>
+        <Text style={styles.balance}>₹{userData?.totalBalance}</Text>
 
         <View style={styles.row}>
           <View style={styles.section}>
             <Text style={styles.label}>Income</Text>
-            <Text style={styles.income}>₹5500.00</Text>
+            <Text style={styles.income}>₹{userData?.income}</Text>
           </View>
           <View style={styles.divider} />
           <View style={styles.section}>
             <Text style={styles.label}>Expenses</Text>
-            <Text style={styles.expenses}>₹284.00</Text>
+            <Text style={styles.expenses}>₹{userData?.expenses}</Text>
           </View>
         </View>
       </View>
 
       <Text style={styles.recentTitle}>Recent Transactions</Text>
 
-      <Transaction
-        title="Salary"
-        category="cinema"
-        amount={300}
-        type="income"
-        Icon={Ghost}
-      />
-      <Transaction
-        title="Salary"
-        category="cinema"
-        amount={300}
-        type="expense"
-        Icon={Ghost}
+      <FlatList
+        style={{ width: '100%', padding: 0 }}
+        data={transactions}
+        keyExtractor={item => item.id}
+        renderItem={({ item }) => (
+          <Transaction
+            title={item.title}
+            category={item.category}
+            amount={item.amount}
+            type={item.type}
+            date={item.date}
+          />
+        )}
       />
     </View>
   );

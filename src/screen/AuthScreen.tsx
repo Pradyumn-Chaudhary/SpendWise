@@ -12,6 +12,7 @@ import { useNavigation } from '@react-navigation/native';
 import auth from '@react-native-firebase/auth';
 import { Eye, EyeOff } from 'lucide-react-native';
 import firestore from '@react-native-firebase/firestore';
+import Transaction from '../Components/Buttons/Transactions';
 
 type AuthProps = {
   logo: any;
@@ -112,6 +113,10 @@ export default function AuthScreen({
           uid: user.uid, // Storing uid for future reference
           isEmailVerified: false,
           createdAt: firestore.FieldValue.serverTimestamp(),
+          totalBalance: 0,
+          income: 0,
+          expenses: 0,
+          transactions: [],
         });
         console.log('User account created & user data saved!');
       }
