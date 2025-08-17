@@ -3,13 +3,14 @@ import React from 'react';
 
 type SignBtnProps = {
   title: string;
+  disabled: boolean
   onPress: () => void;
 };
 
-export default function Btn({ title, onPress }: SignBtnProps) {
+export default function Btn({ title, onPress, disabled }: SignBtnProps) {
   return (
     <View style={{ width: '100%' }}>
-      <TouchableOpacity onPress={onPress} style={styles.btn}>
+      <TouchableOpacity onPress={onPress} style={styles.btn} disabled={disabled}>
         <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16 }}>
           {title}
         </Text>

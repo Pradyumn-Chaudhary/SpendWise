@@ -10,9 +10,6 @@ export default function SignUp({ navigation }: any) {
       footerText="Already have an account?"
       footerLinkText="Sign in"
       name
-      onSubmit={(email, password) =>
-        console.log('Register with', email, password)
-      }
       onFooterPress={() => navigation.navigate('SignIn')}
     />
   );

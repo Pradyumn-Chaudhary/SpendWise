@@ -9,7 +9,6 @@ export default function SignIn({ navigation }: any) {
       buttonTitle="Sign In"
       footerText="Don't have an account?"
       footerLinkText="Sign up"
-      onSubmit={(email, password) => console.log('Login with', email, password)}
       onFooterPress={() => navigation.navigate('SignUp')}
       ForgetPassword
       ForgetLink={() => navigation.navigate('Forget')}
