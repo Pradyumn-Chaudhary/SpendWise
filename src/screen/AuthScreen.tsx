@@ -65,7 +65,22 @@ export default function AuthScreen({
 
   if (initializing) return null;
 
+
+  function isValidEmail(email:string) {
+    // Regex to check for a valid email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
   const handleSignUp = () => {
+    if (password.length == 0 || username.length == 0 || !isValidEmail(email)) {
+      console.log("All field contain valid values");
+      return;
+    }
+    if (password.length < 8) {
+      console.log("Password should have atleast 8 digits")
+      return;
+    }
     setIsBtnPressed(true);
     createUserWithEmailAndPassword(getAuth(), email, password)
       .then(() => {
@@ -82,7 +97,6 @@ export default function AuthScreen({
 
         console.error(error);
       });
-    setIsBtnPressed(false);
   };
 
   const handleSignIn = () => {};

@@ -1,10 +1,23 @@
-import { StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native';
-import React, { useState } from 'react';
-import { LogOut, Ghost } from 'lucide-react-native';
+import { FirebaseAuthTypes, getAuth, onAuthStateChanged, signOut } from '@react-native-firebase/auth';
+import { Ghost, LogOut } from 'lucide-react-native';
+import React, { useEffect, useState } from 'react';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Transaction from '../Components/Buttons/Transactions';
+import auth from '@react-native-firebase/auth';
 
 export default function Expenses({ navigation }: any) {
   const [username, setUsername] = useState('Anu Kuntal');
+  const userId = auth().currentUser?.uid;
+
+  const handleSignOut = async () => {
+    try {
+      await auth().signOut();
+      navigation.navigate('SignIn');
+    } catch (error) {
+      console.error('Error signing out: ', error);
+    }
+  };
+
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -26,10 +39,7 @@ export default function Expenses({ navigation }: any) {
             <Text style={styles.addButtonText}>+ Add</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.iconWrapper}
-            onPress={() => console.log('Logout pressed')}
-          >
+          <TouchableOpacity style={styles.iconWrapper} onPress={handleSignOut}>
             <LogOut color="black" size={24} strokeWidth={1.3} />
           </TouchableOpacity>
         </View>

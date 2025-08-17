@@ -10,7 +10,7 @@ type SignBtnProps = {
 export default function Btn({ title, onPress, disabled }: SignBtnProps) {
   return (
     <View style={{ width: '100%' }}>
-      <TouchableOpacity onPress={onPress} style={styles.btn} disabled={disabled}>
+      <TouchableOpacity onPress={onPress} style={[styles.btn, {backgroundColor: disabled ? "#b49a8b" : '#8a583e'}]} disabled={disabled}>
         <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16 }}>
           {title}
         </Text>
@@ -25,7 +25,6 @@ const styles = StyleSheet.create({
     height: 45,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#8a583e',
     margin: 15,
     borderRadius: 10,
   },
