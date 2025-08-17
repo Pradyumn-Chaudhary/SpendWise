@@ -1,3 +1,6 @@
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
+import { useNavigation } from '@react-navigation/native';
 import {
   ArrowDownCircle,
   ArrowUpCircle,
@@ -19,10 +22,8 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import firestore from '@react-native-firebase/firestore';
+import Toast from 'react-native-toast-message';
 import uuid from 'react-native-uuid';
-import auth from '@react-native-firebase/auth';
-import { useNavigation } from '@react-navigation/native';
 
 const today = new Date();
 
@@ -53,7 +54,11 @@ export default function NewTransaction() {
 
   const handleSave = async () => {
     if (!amount || !title || !category) {
-      console.log('Incomplete', 'Please fill in all fields.');
+      Toast.show({
+        type: 'error',
+        text1: 'Incomplete',
+        text2: 'Please fill in all fields.',
+      });
       return;
     }
     const Amount = parseFloat(amount);
@@ -86,12 +91,17 @@ export default function NewTransaction() {
           totalBalance: firestore.FieldValue.increment(-Amount),
         });
       }
-
-      console.log('Transaction added successfully!');
+      Toast.show({
+        type: 'success',
+        text1: 'Transaction added successfully!',
+      });
       navigation.navigate('Expenses');
     } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Failed to save transaction.',
+      });
       console.error('Error saving transaction:', error);
-      // Alert.alert('Error', 'Failed to save transaction.');
     }
   };
 

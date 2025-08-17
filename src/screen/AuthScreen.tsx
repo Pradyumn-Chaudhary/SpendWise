@@ -1,18 +1,16 @@
+import auth, {
+  FirebaseAuthTypes,
+  getAuth,
+  onAuthStateChanged
+} from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
+import { useNavigation } from '@react-navigation/native';
+import { Eye, EyeOff } from 'lucide-react-native';
+import React, { useEffect, useState } from 'react';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import React, { useState, useEffect, useRef } from 'react';
+import Toast from 'react-native-toast-message';
 import Btn from '../Components/Buttons/Btn';
 import Input from '../Components/Buttons/Input';
-import {
-  getAuth,
-  onAuthStateChanged,
-  FirebaseAuthTypes,
-  createUserWithEmailAndPassword,
-} from '@react-native-firebase/auth';
-import { useNavigation } from '@react-navigation/native';
-import auth from '@react-native-firebase/auth';
-import { Eye, EyeOff } from 'lucide-react-native';
-import firestore from '@react-native-firebase/firestore';
-import Transaction from '../Components/Buttons/Transactions';
 
 type AuthProps = {
   logo: any;
@@ -79,18 +77,27 @@ export default function AuthScreen({
   const handleSignUp = async () => {
     // --- 1.Validation with User Feedback ---
     if (!username || !password || !email) {
-      console.log('Missing Information', 'Please fill in all fields.');
+      Toast.show({
+        type: 'error',
+        text1: 'Missing Information',
+        text2: 'Please fill in all fields.',
+      });
       return;
     }
     if (!isValidEmail(email)) {
-      console.log('Invalid Email', 'Please enter a valid email address.');
+      Toast.show({
+        type: 'error',
+        text1: 'Invalid Email',
+        text2: 'Please enter a valid email address.',
+      });
       return;
     }
     if (password.length < 8) {
-      console.log(
-        'Weak Password',
-        'Password must be at least 8 characters long.',
-      );
+      Toast.show({
+        type: 'error',
+        text1: 'Weak Password',
+        text2: 'Password must be at least 8 characters long.',
+      });
       return;
     }
 
@@ -118,19 +125,32 @@ export default function AuthScreen({
           expenses: 0,
           transactions: [],
         });
-        console.log('User account created & user data saved!');
+        Toast.show({
+          type: 'success',
+          text1: 'Welcome',
+          text2: `${username} 👋`,
+        });
       }
     } catch (error: any) {
       // --- 4. Unified Error Handling ---
       if (error.code === 'auth/email-already-in-use') {
-        console.log('Sign Up Failed', 'That email address is already in use!');
+        Toast.show({
+          type: 'error',
+          text1: 'Sign Up Failed',
+          text2: 'That email address is already in use!',
+        });
       } else if (error.code === 'auth/invalid-email') {
-        console.log('Sign Up Failed', 'The email address is invalid!');
+        Toast.show({
+          type: 'error',
+          text1: 'Sign Up Failed',
+          text2: 'The email address is invalid!',
+        });
       } else {
-        console.log(
-          'An Error Occurred',
-          'Something went wrong during sign-up.',
-        );
+        Toast.show({
+          type: 'error',
+          text1: 'An Error Occurred',
+          text2: 'Something went wrong during sign-up. Please try-again later',
+        });
         console.error(error);
       }
     } finally {
@@ -141,20 +161,36 @@ export default function AuthScreen({
 
   const handleSignIn = async () => {
     if (!email || !password) {
-      console.log('Please enter both email and password.');
+      Toast.show({
+        type: 'error',
+        text1: 'Credential Required',
+        text2: 'Please enter both email and password.',
+      });
       return;
     }
     try {
       // This is the actual function call
       await auth().signInWithEmailAndPassword(email, password);
       // If successful, the onAuthStateChanged listener will handle navigation
-      console.log('User signed in successfully!');
+      Toast.show({
+        type: 'success',
+        text1: 'Welcome Back',
+        text2: `${username} 👋`,
+      });
     } catch (error: any) {
       setIsBtnPressed(false);
       if (error.code === 'auth/invalid-credential') {
-        console.log('Invalid Credentials.');
+        Toast.show({
+          type: 'error',
+          text1: 'Invalid Credentials',
+          text2: 'Enter valid credentials.',
+        });
       } else {
-        console.log('Something went wrong. Please try again later.');
+        Toast.show({
+          type: 'error',
+          text1: 'Something went wrong',
+          text2: 'Please try again later',
+        });
         console.error(error);
       }
     } finally {

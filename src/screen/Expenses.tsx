@@ -6,6 +6,7 @@ import firestore, {
 import { LogOut } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import {
+  Alert,
   FlatList,
   Image,
   StyleSheet,
@@ -13,6 +14,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import Toast from 'react-native-toast-message';
 import Transaction from '../Components/Buttons/Transactions';
 
 type UserData = {
@@ -79,9 +81,128 @@ export default function Expenses({ navigation }: any) {
     try {
       await auth().signOut();
       navigation.navigate('SignIn');
+      Toast.show({
+        type: 'success',
+        text1: 'Signed Out',
+        text2: 'Will miss you 🥺',
+      });
     } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Error signing out',
+        text2: 'Please 🥺',
+      });
       console.error('Error signing out: ', error);
     }
+  };
+
+  const handleDelete = (transactionId: string) => {
+    Alert.alert(
+      'Delete Transaction',
+      'Are you sure you want to delete this transaction?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              if (!userData) {
+                throw new Error(
+                  'User data is not available to perform deletion.',
+                );
+              }
+
+              // Find the full transaction object to remove from Firestore's array
+              const transactionToDelete = transactions.find(
+                t => t.id === transactionId,
+              );
+              if (!transactionToDelete) {
+                throw new Error('Transaction not found!');
+              }
+
+              const userRef = firestore()
+                .collection('Users')
+                .doc(userData?.uid);
+
+              await userRef.update({
+                transactions:
+                  firestore.FieldValue.arrayRemove(transactionToDelete),
+              });
+
+              if (transactionToDelete.type === 'income') {
+                await userRef.update({
+                  income: firestore.FieldValue.increment(
+                    -transactionToDelete.amount,
+                  ),
+                  totalBalance: firestore.FieldValue.increment(
+                    -transactionToDelete.amount,
+                  ),
+                });
+              } else {
+                // type is 'expense'
+                await userRef.update({
+                  expenses: firestore.FieldValue.increment(
+                    -transactionToDelete.amount,
+                  ),
+                  totalBalance: firestore.FieldValue.increment(
+                    transactionToDelete.amount,
+                  ),
+                });
+              }
+
+              // Update the local state to re-render
+              setTransactions(prevTransactions =>
+                prevTransactions.filter(
+                  transaction => transaction.id !== transactionId,
+                ),
+              );
+
+              setUserData(prevData => {
+                // Safety check in case state was cleared during an async operation
+                if (!prevData) return null;
+
+                // Calculate the new balances directly from the previous state
+                const newIncome =
+                  transactionToDelete.type === 'income'
+                    ? prevData.income - transactionToDelete.amount
+                    : prevData.income;
+
+                const newExpenses =
+                  transactionToDelete.type === 'expense'
+                    ? prevData.expenses - transactionToDelete.amount
+                    : prevData.expenses;
+
+                const newTotalBalance =
+                  transactionToDelete.type === 'income'
+                    ? prevData.totalBalance - transactionToDelete.amount
+                    : prevData.totalBalance + transactionToDelete.amount;
+
+                // Return the new state object
+                return {
+                  ...prevData,
+                  income: newIncome,
+                  expenses: newExpenses,
+                  totalBalance: newTotalBalance,
+                };
+              });
+
+              Toast.show({
+                type: 'success',
+                text1: 'Transaction deleted successfully!',
+                onPress: () => Toast.hide(),
+              });
+            } catch (error) {
+              console.error('Error deleting transaction: ', error);
+              Toast.show({
+                type: 'error',
+                text1: 'Could not delete transaction',
+              });
+            }
+          },
+        },
+      ],
+    );
   };
 
   return (
@@ -113,7 +234,7 @@ export default function Expenses({ navigation }: any) {
 
       {/* Balance Card */}
       <View style={styles.card}>
-        <Text style={styles.title}>Total Balance</Text>
+        <Text style={styles.title}>Balance</Text>
         <Text style={styles.balance}>₹{userData?.totalBalance}</Text>
 
         <View style={styles.row}>
@@ -138,11 +259,13 @@ export default function Expenses({ navigation }: any) {
         keyExtractor={item => item.id}
         renderItem={({ item }) => (
           <Transaction
+            id={item.id}
             title={item.title}
             category={item.category}
             amount={item.amount}
             type={item.type}
             date={item.date}
+            onDelete={handleDelete}
           />
         )}
       />

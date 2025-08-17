@@ -1,12 +1,13 @@
-import { StyleSheet, Text, View } from 'react-native';
-import React, { useState } from 'react';
-import Input from '../Components/Buttons/Input';
-import Btn from '../Components/Buttons/Btn';
 import {
+  confirmPasswordReset,
   getAuth,
   sendPasswordResetEmail,
-  confirmPasswordReset,
 } from '@react-native-firebase/auth';
+import React, { useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import Toast from 'react-native-toast-message';
+import Btn from '../Components/Buttons/Btn';
+import Input from '../Components/Buttons/Input';
 
 export default function Forget({ navigation }: any) {
   const [Email, setEmail] = useState('');
@@ -23,11 +24,19 @@ export default function Forget({ navigation }: any) {
 
   const handleForget = async () => {
     if (!Email) {
-      console.log('Missing Email', 'Please enter your email address.');
+      Toast.show({
+        type: 'error',
+        text1: 'Missing Email',
+        text2: 'Please enter your email address.',
+      });
       return;
     }
     if (!isValidEmail(Email)) {
-      console.log('Invalid Email Address');
+      Toast.show({
+        type: 'error',
+        text1: 'Invalid Email Address',
+        text2: 'Please check email address.',
+      });
       return;
     }
     setIsBtnClicked(true);
@@ -37,16 +46,20 @@ export default function Forget({ navigation }: any) {
       await sendPasswordResetEmail(auth, Email);
       // setisCodeSend(true);
       navigation.navigate('SignIn');
-      console.log(
-        'Check Your Email',
-        'If an account exists for this email, a password reset link has been sent. Also check in Spam Folder',
-      );
+      Toast.show({
+        type: 'success',
+        text1: 'Check Your Email',
+        text2:
+          'A password reset link has been sent. Also check in Spam Folder.',
+      });
     } catch (error) {
       // We show a generic message even for errors to prevent user enumeration
-      console.log(
-        'Check Your Email',
-        'If an account exists for this email, a password reset link has been sent.',
-      );
+      Toast.show({
+        type: 'success',
+        text1: 'Check Your Email',
+        text2:
+          'If an account exists for this email, a password reset link has been sent.',
+      });
       console.error('Password reset error:', error);
     } finally {
       setIsBtnClicked(false);
@@ -56,14 +69,19 @@ export default function Forget({ navigation }: any) {
   const handleVerification = async () => {
     // 1. Use Alert for user-facing validation
     if (!Password || !VerificationCode) {
-      console.log(
-        'Missing Information',
-        'Please enter the verification code and a new password.',
-      );
+      Toast.show({
+        type: 'error',
+        text1: 'Missing Information',
+        text2: 'Please enter the verification code and a new password.',
+      });
       return;
     }
     if (Password.length < 8) {
-      console.log('Your password must be at least 8 characters long.');
+      Toast.show({
+        type: 'error',
+        text1: 'Weak Password!',
+        text2: 'Your password must be at least 8 characters long.',
+      });
       return;
     }
 
@@ -74,10 +92,12 @@ export default function Forget({ navigation }: any) {
       await confirmPasswordReset(auth, VerificationCode, Password);
 
       // 2. Provide a clear success message and navigate on completion
-      console.log(
-        'Success!',
-        'Your password has been reset. Please sign in with your new password.',
-      );
+      Toast.show({
+        type: 'success',
+        text1: 'Success!',
+        text2:
+          'Your password has been reset. Please sign in with your new password.',
+      });
       navigation.navigate('SignIn');
     } catch (error: any) {
       // 3. Implement robust error handling
@@ -91,8 +111,11 @@ export default function Forget({ navigation }: any) {
       } else if (error.code === 'auth/weak-password') {
         errorMessage = 'The new password is not strong enough.';
       }
-
-      console.log('Password Reset Failed', errorMessage);
+      Toast.show({
+        type: 'error',
+        text1: 'Password Reset Failed',
+        text2: errorMessage,
+      });
     } finally {
       // This part is perfect! It always re-enables the button.
       setIsBtnClicked(false);

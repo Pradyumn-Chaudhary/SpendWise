@@ -1,16 +1,23 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 type BtnProps = {
   title: string;
   onPress: () => void;
-  disabled?: boolean
+  disabled?: boolean;
 };
 
 export default function Btn({ title, onPress, disabled = false }: BtnProps) {
   return (
     <View style={{ width: '100%' }}>
-      <TouchableOpacity onPress={onPress} style={[styles.btn, {backgroundColor: disabled ? "#b49a8b" : '#8a583e'}]} disabled={disabled}>
+      <TouchableOpacity
+        onPress={onPress}
+        style={[
+          styles.btn,
+          { backgroundColor: disabled ? '#b49a8b' : '#8a583e' },
+        ]}
+        disabled={disabled}
+      >
         <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16 }}>
           {title}
         </Text>

@@ -28,5 +28,5 @@ export const ICONS: { [key: string]: IconComponentType } = {
 };
 
 export const getIcon = (category: string) => {
-    return ICONS[category] || Ghost;
-  };
+  return ICONS[category] || Ghost;
+};

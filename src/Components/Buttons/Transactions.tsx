@@ -1,22 +1,26 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Trash2 } from 'lucide-react-native'; // example icons
+import React from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { getIcon } from '../../utils/IconMap';
 
 type TransactionProps = {
+  id: string;
   title: string;
   category: string;
   amount: number;
   type: 'income' | 'expense';
   date: string;
+  onDelete: (id: string) => void;
 };
 
 export default function Transaction({
+  id,
   title,
   category,
   amount,
   type,
   date,
+  onDelete,
 }: TransactionProps) {
   const Icon = getIcon(category);
   return (
@@ -52,10 +56,7 @@ export default function Transaction({
       </View>
 
       {/* Delete Icon */}
-      <TouchableOpacity
-        style={styles.deleteBtn}
-        onPress={() => console.log('Deleted')}
-      >
+      <TouchableOpacity style={styles.deleteBtn} onPress={() => onDelete(id)}>
         <Trash2 color="#D6171D" size={22} />
       </TouchableOpacity>
     </View>

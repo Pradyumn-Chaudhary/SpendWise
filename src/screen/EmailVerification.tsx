@@ -1,7 +1,7 @@
-import { StyleSheet, Text, View } from 'react-native';
 import React, { useState } from 'react';
-import Input from '../Components/Buttons/Input';
+import { StyleSheet, Text, View } from 'react-native';
 import Btn from '../Components/Buttons/Btn';
+import Input from '../Components/Buttons/Input';
 
 export default function EmailVerification() {
   const [VerificationCode, setVerificationCode] = useState('');
