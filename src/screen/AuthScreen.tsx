@@ -1,7 +1,7 @@
 import auth, {
   FirebaseAuthTypes,
   getAuth,
-  onAuthStateChanged
+  onAuthStateChanged,
 } from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
@@ -118,17 +118,11 @@ export default function AuthScreen({
           username: username,
           email: email,
           uid: user.uid, // Storing uid for future reference
-          isEmailVerified: false,
           createdAt: firestore.FieldValue.serverTimestamp(),
           totalBalance: 0,
           income: 0,
           expenses: 0,
           transactions: [],
-        });
-        Toast.show({
-          type: 'success',
-          text1: 'Welcome',
-          text2: `${username} 👋`,
         });
       }
     } catch (error: any) {
@@ -168,17 +162,11 @@ export default function AuthScreen({
       });
       return;
     }
+    setIsBtnPressed(true);
     try {
       // This is the actual function call
       await auth().signInWithEmailAndPassword(email, password);
-      // If successful, the onAuthStateChanged listener will handle navigation
-      Toast.show({
-        type: 'success',
-        text1: 'Welcome Back',
-        text2: `${username} 👋`,
-      });
     } catch (error: any) {
-      setIsBtnPressed(false);
       if (error.code === 'auth/invalid-credential') {
         Toast.show({
           type: 'error',

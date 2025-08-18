@@ -21,7 +21,6 @@ type UserData = {
   username: string;
   email: string;
   uid: string;
-  isEmailVerified: boolean;
   createdAt: FirebaseFirestoreTypes.Timestamp;
   totalBalance: number;
   income: number;
@@ -204,6 +203,14 @@ export default function Expenses({ navigation }: any) {
       ],
     );
   };
+
+  if (!auth().currentUser) {
+    navigation.navigate('SignIn');
+  }
+
+  if (!auth().currentUser?.emailVerified) {
+    navigation.navigate('EmailVerification');
+  }
 
   return (
     <View style={styles.container}>
