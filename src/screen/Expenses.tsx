@@ -185,12 +185,6 @@ export default function Expenses({ navigation }: any) {
                   totalBalance: newTotalBalance,
                 };
               });
-
-              Toast.show({
-                type: 'success',
-                text1: 'Transaction deleted successfully!',
-                onPress: () => Toast.hide(),
-              });
             } catch (error) {
               console.error('Error deleting transaction: ', error);
               Toast.show({

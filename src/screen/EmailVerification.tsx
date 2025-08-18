@@ -21,7 +21,7 @@ export default function EmailVerification({ navigation }: any) {
           type: 'success',
           text1: 'Verification Link Sent!',
           text2:
-            'Also check your Spam folder. Sign in to app after verification',
+            'Also check your Spam folder. Sign in again after verification',
         });
         navigation.navigate('SignIn');
         auth().signOut();

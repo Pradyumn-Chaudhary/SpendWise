@@ -91,11 +91,6 @@ export default function NewTransaction() {
           totalBalance: firestore.FieldValue.increment(-Amount),
         });
       }
-      Toast.show({
-        type: 'success',
-        text1: 'Transaction added successfully!',
-        onPress: () => Toast.hide(),
-      });
       navigation.navigate('Expenses');
     } catch (error) {
       Toast.show({
