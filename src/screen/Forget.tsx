@@ -62,7 +62,9 @@ export default function Forget({ navigation }: any) {
       });
       console.error('Password reset error:', error);
     } finally {
-      setIsBtnClicked(false);
+      setTimeout(() => {
+        setIsBtnClicked(false);
+      }, 60000);
     }
   };
 
@@ -117,8 +119,10 @@ export default function Forget({ navigation }: any) {
         text2: errorMessage,
       });
     } finally {
-      // This part is perfect! It always re-enables the button.
-      setIsBtnClicked(false);
+      // It always re-enables the button.
+      setTimeout(() => {
+        setIsBtnClicked(false);
+      }, 60000);
     }
   };
 

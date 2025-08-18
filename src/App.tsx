@@ -18,7 +18,7 @@ export default function App() {
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="SignUp" component={SignUp} />
         <Stack.Screen name="SignIn" component={SignIn} />
-        <Stack.Screen name="Email-Verification" component={EmailVerification} />
+        <Stack.Screen name="EmailVerification" component={EmailVerification} />
         <Stack.Screen name="Forget" component={Forget} />
         <Stack.Screen name="Expenses" component={Expenses} />
         <Stack.Screen name="NewExpense" component={NewExpense} />

@@ -94,6 +94,7 @@ export default function NewTransaction() {
       Toast.show({
         type: 'success',
         text1: 'Transaction added successfully!',
+        onPress: () => Toast.hide(),
       });
       navigation.navigate('Expenses');
     } catch (error) {
