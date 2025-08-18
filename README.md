@@ -15,5 +15,5 @@
 
 ## Download
 
-[Download Thermo App v1.0.0](https://github.com/Pradyumn-Chaudhary/SpendWise/releases/download/v1.0.0/SpendWise.apk)
+[Download SpendWise App v1.0.0](https://github.com/Pradyumn-Chaudhary/SpendWise/releases/download/v1.0.0/SpendWise.apk)
 
