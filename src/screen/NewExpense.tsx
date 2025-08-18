@@ -40,6 +40,7 @@ export default function NewTransaction() {
   const [category, setCategory] = useState('');
   const uid = auth().currentUser?.uid;
   const navigation = useNavigation<any>();
+  const [isBtnClicked, setisBtnClicked] = useState(false);
 
   const categories = [
     { name: 'Food', icon: Utensils },
@@ -71,7 +72,7 @@ export default function NewTransaction() {
       date: formattedDate,
       createdAt: Date.now(),
     };
-
+    setisBtnClicked(true);
     try {
       // 1. Get a reference to the user's document
       const userRef = firestore().collection('Users').doc(uid);
@@ -98,6 +99,8 @@ export default function NewTransaction() {
         text1: 'Failed to save transaction.',
       });
       console.error('Error saving transaction:', error);
+    } finally {
+      setisBtnClicked(false);
     }
   };
 
@@ -106,7 +109,7 @@ export default function NewTransaction() {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerText}>New Transaction</Text>
-        <TouchableOpacity onPress={handleSave}>
+        <TouchableOpacity onPress={handleSave} disabled={isBtnClicked}>
           <Text style={styles.save}>Save ✓</Text>
         </TouchableOpacity>
       </View>
