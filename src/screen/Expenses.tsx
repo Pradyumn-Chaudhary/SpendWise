@@ -5,6 +5,7 @@ import firestore, {
 } from '@react-native-firebase/firestore';
 import { LogOut } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   Alert,
   FlatList,
@@ -207,7 +208,7 @@ export default function Expenses({ navigation }: any) {
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
@@ -270,7 +271,7 @@ export default function Expenses({ navigation }: any) {
           />
         )}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -282,25 +283,26 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   header: {
+    width:'100%',
     flexDirection: 'row',
-    padding: 10,
+    justifyContent: 'space-between',
   },
   headerLeft: {
     flexDirection: 'row',
+    flexShrink:1,
     alignItems: 'center',
   },
   headerRight: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
     alignItems: 'center',
-    width: '50%',
+    flexShrink:1,
   },
   logo: {
     height: 100,
-    width: 100,
+    width: 60,
   },
   userInfo: {
-    marginLeft: 8,
+    
   },
   welcomeText: {
     color: '#9f9895',

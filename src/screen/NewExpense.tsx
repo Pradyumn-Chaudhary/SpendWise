@@ -22,6 +22,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { SafeAreaView  } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import uuid from 'react-native-uuid';
 
@@ -105,119 +106,124 @@ export default function NewTransaction() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerText}>New Transaction</Text>
-        <TouchableOpacity onPress={handleSave} disabled={isBtnClicked}>
-          <Text style={styles.save}>Save ✓</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View
-        style={{
-          elevation: 15,
-          backgroundColor: 'white',
-          padding: 20,
-          borderRadius: 20,
-        }}
-      >
-        {/* Expense / Income Toggle */}
-        <View style={styles.toggleContainer}>
-          <TouchableOpacity
-            style={[styles.toggle, type === 'expense' && styles.activeExpense]}
-            onPress={() => setType('expense')}
-          >
-            <ArrowDownCircle
-              color={type === 'expense' ? '#fff' : '#555'}
-              size={20}
-            />
-            <Text
-              style={[
-                styles.toggleText,
-                type === 'expense' && { color: '#fff' },
-              ]}
-            >
-              Expense
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.toggle, type === 'income' && styles.activeIncome]}
-            onPress={() => setType('income')}
-          >
-            <ArrowUpCircle
-              color={type === 'income' ? '#fff' : '#555'}
-              size={20}
-            />
-            <Text
-              style={[
-                styles.toggleText,
-                type === 'income' && { color: '#fff' },
-              ]}
-            >
-              Income
-            </Text>
+    <SafeAreaView style={{flex:1}} >
+      <ScrollView contentContainerStyle={styles.container}>
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.headerText}>New Transaction</Text>
+          <TouchableOpacity onPress={handleSave} disabled={isBtnClicked}>
+            <Text style={styles.save}>Save ✓</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Amount */}
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Text style={styles.currency}>₹</Text>
-          <TextInput
-            style={styles.amountInput}
-            keyboardType="numeric"
-            placeholder="0.00"
-            value={amount}
-            onChangeText={setAmount}
-          />
-        </View>
-
-        {/* Title */}
-        <TextInput
-          style={styles.input}
-          placeholder="Transaction Title"
-          value={title}
-          onChangeText={setTitle}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Transaction Category"
-          value={category}
-          onChangeText={setCategory}
-        />
-
-        {/* Category */}
-        <Text style={styles.label}>Category</Text>
-        <View style={styles.categoryContainer}>
-          {categories.map((cat, index) => {
-            const Icon = cat.icon;
-            return (
-              <TouchableOpacity
-                key={index}
+        <View
+          style={{
+            elevation: 15,
+            backgroundColor: 'white',
+            padding: 20,
+            borderRadius: 20,
+          }}
+        >
+          {/* Expense / Income Toggle */}
+          <View style={styles.toggleContainer}>
+            <TouchableOpacity
+              style={[
+                styles.toggle,
+                type === 'expense' && styles.activeExpense,
+              ]}
+              onPress={() => setType('expense')}
+            >
+              <ArrowDownCircle
+                color={type === 'expense' ? '#fff' : '#555'}
+                size={20}
+              />
+              <Text
                 style={[
-                  styles.category,
-                  category === cat.name && styles.activeCategory,
+                  styles.toggleText,
+                  type === 'expense' && { color: '#fff' },
                 ]}
-                onPress={() => setCategory(cat.name)}
               >
-                <Icon
-                  size={18}
-                  color={category === cat.name ? '#fff' : '#555'}
-                />
-                <Text
+                Expense
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.toggle, type === 'income' && styles.activeIncome]}
+              onPress={() => setType('income')}
+            >
+              <ArrowUpCircle
+                color={type === 'income' ? '#fff' : '#555'}
+                size={20}
+              />
+              <Text
+                style={[
+                  styles.toggleText,
+                  type === 'income' && { color: '#fff' },
+                ]}
+              >
+                Income
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Amount */}
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Text style={styles.currency}>₹</Text>
+            <TextInput
+              style={styles.amountInput}
+              keyboardType="numeric"
+              placeholder="0.00"
+              value={amount}
+              onChangeText={setAmount}
+            />
+          </View>
+
+          {/* Title */}
+          <TextInput
+            style={styles.input}
+            placeholder="Transaction Title"
+            value={title}
+            onChangeText={setTitle}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Transaction Category"
+            value={category}
+            onChangeText={setCategory}
+          />
+
+          {/* Category */}
+          <Text style={styles.label}>Category</Text>
+          <View style={styles.categoryContainer}>
+            {categories.map((cat, index) => {
+              const Icon = cat.icon;
+              return (
+                <TouchableOpacity
+                  key={index}
                   style={[
-                    styles.categoryText,
-                    category === cat.name && { color: '#fff' },
+                    styles.category,
+                    category === cat.name && styles.activeCategory,
                   ]}
+                  onPress={() => setCategory(cat.name)}
                 >
-                  {cat.name}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
+                  <Icon
+                    size={18}
+                    color={category === cat.name ? '#fff' : '#555'}
+                  />
+                  <Text
+                    style={[
+                      styles.categoryText,
+                      category === cat.name && { color: '#fff' },
+                    ]}
+                  >
+                    {cat.name}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
